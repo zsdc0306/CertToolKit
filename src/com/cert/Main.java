@@ -1,14 +1,10 @@
 package com.cert;
 
-import java.io.File;
-import org.ejbca.cvc.CVCObject;
 import org.ejbca.cvc.CertificateParser;
 import org.ejbca.cvc.example.FileHelper;
 import org.ejbca.cvc.*;
-import org.json.*;
 import java.util.Date;
 import java.util.Base64;
-import java.util.Spliterator;
 
 import org.apache.commons.cli.*;
 
@@ -17,36 +13,34 @@ import org.apache.commons.cli.*;
 public class Main {
     private Options addOption(String[] args){
         Options options = new Options();
-        Option deserializeCVC = new Option("l", "load", true, "read cvc file");
-        Option serializeCVC = new Option("d","serialize", true,"cvc data byte");
+        Option loadCVC = new Option("l", "load", true, "read cvc file to text");
+        Option serializeCVC = new Option("d","decode", true,"get decoded CVC");
         Option generateCVC = new Option("g", "generate", true, "generate the certificate");
-        Option getByte = new Option("e", "getbyte", true, "get byte from file name");
-        options.addOption(deserializeCVC);
+        Option getByte = new Option("e", "extract", true, "extract encoded CVC");
+        options.addOption(loadCVC);
         options.addOption(serializeCVC);
         options.addOption(generateCVC);
         options.addOption(getByte);
         return options;
     }
 
-    private String serializeCert(String file) {
+    private String readCert(String file) {
         String cert;
         try {
-            byte[] certData = FileHelper.loadFile(file);
-            CVCertificate cvc = CertificateParser.parseCertificate(certData);
-            String cert_id = cvc.getCertificateBody().getAuthorityReference().getMnemonic();
-            cert=cvc.getAsText(); // NOPMD
-            return cert;
+            byte[] certData = getByteFromCertFile(file);
+            if(certData != null) {
+                CVCertificate cvc = CertificateParser.parseCertificate(certData);
+                cert=cvc.getAsText(); // NOPMD
+                return cert;
+            }else{
+                return "";
+            }
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        return null;
+        return "";
     }
-
-//    private static JSONObject toJson(String certStr){
-//        JSONObject obj = new JSONObject(certStr);
-//        return obj;
-//    }
 
     private void extractCert(byte[] certData){
         try {
@@ -83,9 +77,9 @@ public class Main {
     }
 
 
-    private byte[] getByteFromCertFile(String file){
+    private byte[] getByteFromCertFile(String filePath){
         try {
-            return FileHelper.loadFile(file);
+            return FileHelper.loadFile(filePath);
         }catch (Exception e){
             System.out.println(e.getMessage());
             return null;
@@ -110,12 +104,20 @@ public class Main {
         if(cmd.hasOption("l")){
             try {
                 String file = cmd.getOptionValue("l");
-                System.out.println(app.serializeCert(file));
+                System.out.println(app.readCert(file));
             }
             catch (Exception e){
                 System.out.println(e.getMessage());
             }
-
+        }
+        if(cmd.hasOption("d")){
+            try {
+                String file = cmd.getOptionValue("d");
+                app.getEncodedByte(file);
+            }
+            catch (Exception e){
+                System.out.println(e.getMessage());
+            }
         }
         if(cmd.hasOption("e")){
             String file = cmd.getOptionValue("e");
