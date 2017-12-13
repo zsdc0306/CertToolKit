@@ -14,13 +14,15 @@ public class Main {
     private Options addOption(String[] args){
         Options options = new Options();
         Option loadCVC = new Option("l", "load", true, "read cvc file to text");
-        Option serializeCVC = new Option("d","decode", true,"get decoded CVC");
+        Option decodeCVC = new Option("d","decode", true,"get decoded CVC");
         Option generateCVC = new Option("g", "generate", true, "generate the certificate");
-        Option getByte = new Option("e", "extract", true, "extract encoded CVC");
+        Option extractCVC = new Option("e", "extract", true, "extract encoded CVC");
+        Option checkCVC = new Option("c", "check", true, "check cert id, status and public key");
         options.addOption(loadCVC);
-        options.addOption(serializeCVC);
+        options.addOption(decodeCVC);
         options.addOption(generateCVC);
-        options.addOption(getByte);
+        options.addOption(extractCVC);
+        options.addOption(checkCVC);
         return options;
     }
 
@@ -121,14 +123,17 @@ public class Main {
         }
         if(cmd.hasOption("e")){
             String file = cmd.getOptionValue("e");
-            System.out.println(file);
             app.getEncodedByte(file);
         }
-        if(cmd.hasOption("g")){
-            String str = "fyGCAWx/ToHkXykBAEIQVVNQQVNTLUNWQ0EwMDAwMX9JgZQGCgQAfwAHAgICAQGBgYC5sSuW+3Ovydqb1AxgaBozq+WilQZrB9xqdzzaEQASg90+zBhU8yAp661/2lBbk44YlEEVy44371OLU9Nk4u+BPsIql/j0dfPV+tqDSUqDu6oUZ3kPtjpPHl4JAl2Q4TKCaDWbh04P+HHEb+ebeSxaqgvwtr/amhzmY5bNuckBmYIDAQABXyAQVVNQQVNTLUNWQ0EwMDAwMX9MDgYJBAB/AAcDAQIBUwEDXyUGAQcBAQEFXyQGAQgAAgEFXzeBgFVe4fkm1QzqHa9iJ3q1rMAttigaQgGb01f35+Qg1QE0YJdzyVEao2ffN989M6kWHRYv7IJxLx5d49dqEYfQhR7ueyQmJ9nNExTDqpJmmi/wsFGG8TpPCnTfgOYU7M+Yii4VoEqrkA5MgysDYQFrw4dan9dtZ85bLD93qGVQA1wC";
-//            String str = cmd.getOptionValue("g");
+        if(cmd.hasOption("c")){
+//            String str = "fyGCAWx/ToHkXykBAEIQVVNQQVNTLUNWQ0EwMDAwMX9JgZQGCgQAfwAHAgICAQGBgYC5sSuW+3Ovydqb1AxgaBozq+WilQZrB9xqdzzaEQASg90+zBhU8yAp661/2lBbk44YlEEVy44371OLU9Nk4u+BPsIql/j0dfPV+tqDSUqDu6oUZ3kPtjpPHl4JAl2Q4TKCaDWbh04P+HHEb+ebeSxaqgvwtr/amhzmY5bNuckBmYIDAQABXyAQVVNQQVNTLUNWQ0EwMDAwMX9MDgYJBAB/AAcDAQIBUwEDXyUGAQcBAQEFXyQGAQgAAgEFXzeBgFVe4fkm1QzqHa9iJ3q1rMAttigaQgGb01f35+Qg1QE0YJdzyVEao2ffN989M6kWHRYv7IJxLx5d49dqEYfQhR7ueyQmJ9nNExTDqpJmmi/wsFGG8TpPCnTfgOYU7M+Yii4VoEqrkA5MgysDYQFrw4dan9dtZ85bLD93qGVQA1wC";
+            String str = cmd.getOptionValue("c");
             app.getCertIDAndStatus(str);
         }
+        if(cmd.hasOption("g")){
+            System.out.println("not implemented");
+        }
+
 
 
     }
