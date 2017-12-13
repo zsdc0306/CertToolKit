@@ -13,11 +13,33 @@ import org.apache.commons.cli.*;
 public class Main {
     private Options addOption(String[] args){
         Options options = new Options();
-        Option loadCVC = new Option("l", "load", true, "read cvc file to text");
-        Option decodeCVC = new Option("d","decode", true,"get decoded CVC");
+        Option help = new Option("h", "help",false,"print this information");
+        Option loadCVC = Option.builder("l")
+                .longOpt("load")
+                .argName("file path")
+                .hasArg()
+                .desc("read cvc file to text")
+                .build();
+        Option decodeCVC = Option.builder("d")
+                .longOpt("decode")
+                .hasArg()
+                .argName("file path")
+                .desc("get decoded CVC text")
+                .build();
+        Option extractCVC = Option.builder("e")
+                .longOpt("extract")
+                .hasArg()
+                .argName("file path")
+                .desc("encoded CVC")
+                .build();
+        Option checkCVC = Option.builder("c")
+                .longOpt("check")
+                .hasArg()
+                .argName("Encoded cert")
+                .desc("check cert id, status and public key")
+                .build();
         Option generateCVC = new Option("g", "generate", true, "generate the certificate");
-        Option extractCVC = new Option("e", "extract", true, "extract encoded CVC");
-        Option checkCVC = new Option("c", "check", true, "check cert id, status and public key");
+        options.addOption(help);
         options.addOption(loadCVC);
         options.addOption(decodeCVC);
         options.addOption(generateCVC);
@@ -62,8 +84,17 @@ public class Main {
         extractCert(decodeCertStr(recvStr));
     }
 
+    private void decodeCert(String str){
+        byte[] certdata = decodeCertStr(str);
+        try{
+            CVCertificate cvc = CertificateParser.parseCertificate(certdata);
+            System.out.println(cvc.getAsText());
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
 
-    private void getEncodedByte(String file){
+    private void getEncodeStr(String file){
         try{
             byte[] certbyte = getByteFromCertFile(file);
             String encodedCertStr = Base64.getEncoder().encodeToString(certbyte);
@@ -99,10 +130,15 @@ public class Main {
             cmd = parser.parse(options, args);
         }catch(ParseException e){
             System.out.println(e.getMessage());
-            formatter.printHelp("cert path", options);
+            formatter.printHelp("CVC cert toolkit", options);
             System.exit(1);
             return;
         }
+        if(cmd.hasOption("h")){
+            formatter.printHelp("CVC cert toolkit", options);
+            System.exit(1);
+        }
+
         if(cmd.hasOption("l")){
             try {
                 String file = cmd.getOptionValue("l");
@@ -114,8 +150,8 @@ public class Main {
         }
         if(cmd.hasOption("d")){
             try {
-                String file = cmd.getOptionValue("d");
-                app.getEncodedByte(file);
+                String str = cmd.getOptionValue("d");
+                app.decodeCert(str);
             }
             catch (Exception e){
                 System.out.println(e.getMessage());
@@ -123,7 +159,7 @@ public class Main {
         }
         if(cmd.hasOption("e")){
             String file = cmd.getOptionValue("e");
-            app.getEncodedByte(file);
+            app.getEncodeStr(file);
         }
         if(cmd.hasOption("c")){
 //            String str = "fyGCAWx/ToHkXykBAEIQVVNQQVNTLUNWQ0EwMDAwMX9JgZQGCgQAfwAHAgICAQGBgYC5sSuW+3Ovydqb1AxgaBozq+WilQZrB9xqdzzaEQASg90+zBhU8yAp661/2lBbk44YlEEVy44371OLU9Nk4u+BPsIql/j0dfPV+tqDSUqDu6oUZ3kPtjpPHl4JAl2Q4TKCaDWbh04P+HHEb+ebeSxaqgvwtr/amhzmY5bNuckBmYIDAQABXyAQVVNQQVNTLUNWQ0EwMDAwMX9MDgYJBAB/AAcDAQIBUwEDXyUGAQcBAQEFXyQGAQgAAgEFXzeBgFVe4fkm1QzqHa9iJ3q1rMAttigaQgGb01f35+Qg1QE0YJdzyVEao2ffN989M6kWHRYv7IJxLx5d49dqEYfQhR7ueyQmJ9nNExTDqpJmmi/wsFGG8TpPCnTfgOYU7M+Yii4VoEqrkA5MgysDYQFrw4dan9dtZ85bLD93qGVQA1wC";
